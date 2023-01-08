@@ -206,8 +206,8 @@ def minimax(board, player, depth=4, alpha=-float("inf"), beta=float("inf"), eval
             if alpha >= beta:
                 break
     # If no valid column was found, select a random valid column
-#    if best_column is None:
-#        best_column = choice(board)
+    if best_column is None:
+        best_column = choice(board)
     return alpha, best_column
 
 
