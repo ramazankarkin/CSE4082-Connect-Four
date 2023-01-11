@@ -10,7 +10,7 @@ USER_1 = 0
 USER_2 = 1
 
 
-# Create a board with ROWS and COLUMNS filled with -1
+# Create a board with specific ROWS and COLUMNS filled with -1.
 def game_board():
     game_board = []
     for row in range(ROWS):
@@ -18,7 +18,8 @@ def game_board():
     return game_board
 
 
-# Start from the bottom and check specific column for the player and fill the player's value specified column
+# Start from the bottom and check specific column for the player then fill the player's value specified column.
+# check invalid column.
 def move_piece(game_board, player, column):
     if column < 0 or column >= COLUMNS:
         raise ValueError("Invalid column")
@@ -30,8 +31,23 @@ def move_piece(game_board, player, column):
                 return
 
 
+# Returns True if the given column is a valid move, False otherwise.
+def is_playable(game_board, column):
+    return game_board[0][column] == -1
+
+
+# It will check board for valid move and if there is a valid move then it will choose a random column.
+def choice(board):
+    valid_columns = [column for column in range(COLUMNS) if is_playable(board, column)]
+    if valid_columns:
+        return random.choice(valid_columns)
+    return None
+
+
+# Check the win condition for the player.
 def win_condition(game_board, player):
-    # check horizontal
+    # check the whole board If there are 4 identical pieces horizontally,
+    # according to the value that the player has, send the winning condition True.
     for row in range(ROWS):
         for column in range(COLUMNS):
             if column < COLUMNS - 3:
@@ -39,7 +55,8 @@ def win_condition(game_board, player):
                         game_board[row][column + 2] == player and game_board[row][column + 3] == player:
                     return True
 
-    # check vertical
+    # check the whole board If there are 4 identical pieces vertically,
+    # according to the value that the player has, send the winning condition True.
     for row in range(ROWS):
         for column in range(COLUMNS):
             if row < ROWS - 3:
@@ -47,7 +64,8 @@ def win_condition(game_board, player):
                         game_board[row + 2][column] == player and game_board[row + 3][column] == player:
                     return True
 
-    # check diagonal
+    # check the whole board If there are 4 identical pieces diagonally,
+    # according to the value that the player has, send the winning condition True.
     for row in range(ROWS):
         for column in range(COLUMNS):
             if row < ROWS - 3 and column < COLUMNS - 3:
@@ -55,7 +73,8 @@ def win_condition(game_board, player):
                         game_board[row + 2][column + 2] == player and game_board[row + 3][column + 3] == player:
                     return True
 
-    # check anti diagonal
+    # check the whole board If there are 4 identical pieces anti-diagonally,
+    # according to the value that the player has, send the winning condition True.
     for row in range(ROWS):
         for column in range(COLUMNS):
             if row < ROWS - 3 and column > 2:
@@ -65,8 +84,8 @@ def win_condition(game_board, player):
     return False
 
 
+# This function prints the Connect-Four game play field and also player's move to the console.
 def print_board(board):
-    """Prints the board to the console."""
     for row in range(ROWS):
         print("|", end="")
         for col in range(COLUMNS):
@@ -80,21 +99,13 @@ def print_board(board):
     print("-" * (COLUMNS * 2 + 1))
 
 
-def choice(board):
-    valid_columns = [column for column in range(COLUMNS) if is_playable(board, column)]
-    if valid_columns:
-        return random.choice(valid_columns)
-    return None
-
-
 def evaluate_heuristic1(board, player):
     if win_condition(board, player):
         return float("inf")
     if win_condition(board, (player + 1) % 2):
         return -float("inf")
 
-    # Initialize the score to the number of empty spaces on the board
-    score = sum(1 for row in board for cell in row if cell == -1)
+    score = 0
 
     # Add a bonus for each three-in-a-row sequence that can be completed by the current player
     for row in range(ROWS):
@@ -211,11 +222,6 @@ def minimax(board, player, depth=4, alpha=-float("inf"), beta=float("inf"), eval
     return alpha, best_column
 
 
-def is_playable(board, column):
-    """Returns True if the given column is a valid move, False otherwise."""
-    return board[0][column] == -1
-
-
 def option1(player_1, player_2):
     board = game_board()
     print("Initial board state:")
@@ -255,10 +261,10 @@ def option1(player_1, player_2):
 def option2(player_1, player_2):
     board = game_board()
     print("Initial board state:")
+    print_board(board)
 
     while True:
         try:
-            print_board(board)
             column = int(input("Player 1 enter column: "))
             move_piece(board, player_1, column)
             print_board(board)
@@ -341,7 +347,7 @@ def option3(player_1):
             print("It's a tie!")
             break
 
-        # Switch players
+        # Switch AI players
         current_player = (current_player + 1) % 2
 
 
@@ -367,7 +373,7 @@ if __name__ == '__main__':
     main()
 
 """
-kontrol etmek için 
+We used the following board state to check if some part of the function is giving correct results.
 boards = [[1, 0, 0, 1, 0, 1, 0, 1],
           [0, 1, 0, 1, 0, 1, 0, 1],
           [1, 0, 0, 1, 0, 1, 0, 1],
