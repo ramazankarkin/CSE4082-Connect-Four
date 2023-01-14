@@ -140,7 +140,10 @@ def evaluate_heuristic1(board, player):
     return score
 
 
-# This is a heuristic function for getting the score with respect to the weights of each location on the board
+# This heuristic function uses a weight matrix to assign a score to each cell on the board.
+# We have given weight to each position according to the positions we think are more important,
+# with higher weights given to cells in the center of the board. This way,
+# the AI player will prioritize moves that are made in the center of the board.
 def evaluate_heuristic2(board, player):
     if win_condition(board, player):
         return float("inf")
@@ -166,14 +169,14 @@ def evaluate_heuristic2(board, player):
         for col in range(COLUMNS):
             if board[row][col] == player:
                 score += weights[row][col]
-            elif board[row][col] == (player + 1) % 2:
-                score -= weights[row][col]
 
     return score
 
 
 # This heuristic function uses evaluate_heuristic2 and also checks number of occurrences of two adjacent same player
-# values, for each occurrence of two adjacent same values, the function will triple the score.
+# values, after heuristic2 assigned a score to each cell on the board according to the weight matrix, then for each
+# occurrence of two adjacent same values, it will triple the score
+
 def evaluate_heuristic3(board, player):
     """Returns a score for the given board and player."""
     if win_condition(board, player):
@@ -223,8 +226,7 @@ def evaluate_heuristic3(board, player):
 # the alpha and beta values which are used to prune the search tree to avoid unnecessary work.
 # The function takes the current state of the board, the player
 # that is making the move, alpha, beta, and evaluation function as inputs.
-def minimax(board, player, depth=6, alpha=-float("inf"), beta=float("inf"), eval_func=evaluate_heuristic3):
-    """Returns the best column to move and the associated minimax score."""
+def minimax(board, player, depth=4, alpha=-float("inf"), beta=float("inf"), eval_func=evaluate_heuristic3):
     if depth == 0 or win_condition(board, player):
         # Use the specified evaluation function
         score = eval_func(board, player)
@@ -380,6 +382,7 @@ def option3(player_1):
 
         # Switch AI players
         current_player = (current_player + 1) % 2
+
 
 # This is the main function that is used to start the game. If option 3 is selected then
 # the game asks to choose the evaluation function for both the AI players.
