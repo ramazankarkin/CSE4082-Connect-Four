@@ -1,7 +1,15 @@
 from copy import deepcopy
 import random
 
+# Ramazan Karkin 150119512
+# Emirkan Karabulut 150118052
+# This is the homework 2 for the Artificial Intelligence course. This homework is about the Connect-Four game.
+
+
 # Constants for the board
+# Caution: If you want to change the board size, the heuristic function 2 and 3 should be changed.
+# Otherwise, it will not work. Because the heuristic function 2 and 3 are designed for 7x8 board.
+
 ROWS = 7
 COLUMNS = 8
 
@@ -99,6 +107,8 @@ def print_board(board):
     print("-" * (COLUMNS * 2 + 1))
 
 
+# This heuristic function checks number of occurrences of three-in-a-row sequence that can be completed
+# by the current player, if there exist any such sequence, it adds 1 to the score.
 def evaluate_heuristic1(board, player):
     if win_condition(board, player):
         return float("inf")
@@ -106,8 +116,7 @@ def evaluate_heuristic1(board, player):
         return -float("inf")
 
     score = 0
-
-    # Add a bonus for each three-in-a-row sequence that can be completed by the current player
+    # add 1 to the score if there is a three-in-a-row sequence that can be completed by the current player
     for row in range(ROWS):
         for col in range(COLUMNS):
             if board[row][col] == player:
@@ -133,7 +142,6 @@ def evaluate_heuristic1(board, player):
 
 # This is a heuristic function for getting the score with respect to the weights of each location on the board
 def evaluate_heuristic2(board, player):
-    """Returns a score for the given board and player."""
     if win_condition(board, player):
         return float("inf")
     if win_condition(board, (player + 1) % 2):
@@ -142,18 +150,18 @@ def evaluate_heuristic2(board, player):
     # Initialize the score to 0
     score = 0
 
-    # Create a matrix of weights for each position on the board
+    # Created a matrix of weights for each position
     weights = [
-        [3, 4, 5, 7, 7, 5, 4, 3],
-        [4, 6, 8, 10, 10, 8, 6, 4],
-        [5, 8, 11, 13, 13, 11, 8, 5],
-        [7, 9, 13, 15, 15, 13, 9, 7],
-        [5, 8, 11, 13, 13, 11, 8, 5],
-        [4, 6, 8, 10, 10, 8, 6, 4],
-        [3, 4, 5, 7, 7, 5, 4, 3]
+        [2, 5, 7, 9, 9, 7, 5, 2],
+        [4, 7, 9, 11, 11, 9, 7, 4],
+        [6, 10, 14, 18, 18, 14, 10, 6],
+        [8, 13, 18, 23, 23, 18, 13, 8],
+        [6, 10, 14, 18, 18, 14, 10, 6],
+        [4, 7, 9, 11, 11, 9, 7, 4],
+        [2, 5, 7, 9, 9, 7, 5, 2]
     ]
 
-    # Loop through the board and add the corresponding weight for each cell
+    # Add the corresponding weight for each cell
     for row in range(ROWS):
         for col in range(COLUMNS):
             if board[row][col] == player:
@@ -164,7 +172,8 @@ def evaluate_heuristic2(board, player):
     return score
 
 
-# This heuristic function is same with heuristic 2, it will change.
+# This heuristic function uses evaluate_heuristic2 and also checks number of occurrences of two adjacent same player
+# values, for each occurrence of two adjacent same values, the function will triple the score.
 def evaluate_heuristic3(board, player):
     """Returns a score for the given board and player."""
     if win_condition(board, player):
@@ -172,32 +181,49 @@ def evaluate_heuristic3(board, player):
     if win_condition(board, (player + 1) % 2):
         return -float("inf")
 
-    # Initialize the score to 0
     score = 0
 
-    # Create a matrix of weights for each position on the board
     weights = [
-        [3, 4, 5, 7, 7, 5, 4, 3],
-        [4, 6, 8, 10, 10, 8, 6, 4],
-        [5, 8, 11, 13, 13, 11, 8, 5],
-        [7, 9, 13, 15, 15, 13, 9, 7],
-        [5, 8, 11, 13, 13, 11, 8, 5],
-        [4, 6, 8, 10, 10, 8, 6, 4],
-        [3, 4, 5, 7, 7, 5, 4, 3]
+        [2, 5, 7, 9, 9, 7, 5, 2],
+        [4, 7, 9, 11, 11, 9, 7, 4],
+        [6, 10, 14, 18, 18, 14, 10, 6],
+        [8, 13, 18, 23, 23, 18, 13, 8],
+        [6, 10, 14, 18, 18, 14, 10, 6],
+        [4, 7, 9, 11, 11, 9, 7, 4],
+        [2, 5, 7, 9, 9, 7, 5, 2]
     ]
-
-    # Loop through the board and add the corresponding weight for each cell
+    # Add the corresponding weight for each cell
     for row in range(ROWS):
         for col in range(COLUMNS):
             if board[row][col] == player:
                 score += weights[row][col]
-            elif board[row][col] == (player + 1) % 2:
-                score -= weights[row][col]
+    # checks number of occurrences of two adjacent same player values
+    for row in range(ROWS):
+        for col in range(COLUMNS):
+            if board[row][col] == player:
+                # Check horizontally
+                if (col < COLUMNS - 1 and board[row][col + 1] == player) or (col > 0 and board[row][col - 1] == player):
+                    score += 3
+                # Check vertically
+                if (row < ROWS - 1 and board[row + 1][col] == player) or (row > 0 and board[row - 1][col] == player):
+                    score += 3
+                # Check diagonally
+                if (row < ROWS - 1 and col < COLUMNS - 1 and board[row + 1][col + 1] == player) or (
+                        row > 0 and col > 0 and board[row - 1][col - 1] == player):
+                    score += 3
+                if (row < ROWS - 1 and col > 0 and board[row + 1][col - 1] == player) or (
+                        row > 0 and col < COLUMNS - 1 and board[row - 1][col + 1] == player):
+                    score += 3
 
     return score
 
 
-def minimax(board, player, depth=4, alpha=-float("inf"), beta=float("inf"), eval_func=evaluate_heuristic1):
+# The minimax algorithm approach for which we applied is
+# by recursively calling the minimax function for each playable column on the board, and finding
+# the alpha and beta values which are used to prune the search tree to avoid unnecessary work.
+# The function takes the current state of the board, the player
+# that is making the move, alpha, beta, and evaluation function as inputs.
+def minimax(board, player, depth=6, alpha=-float("inf"), beta=float("inf"), eval_func=evaluate_heuristic3):
     """Returns the best column to move and the associated minimax score."""
     if depth == 0 or win_condition(board, player):
         # Use the specified evaluation function
@@ -292,21 +318,26 @@ def option2(player_1, player_2):
 
 
 def option3(player_1):
-    """Play two AI players against each other."""
     board = game_board()
     current_player = player_1
-
-    print("Choose evaluation function for AI player1:")
-    print("1.Heuristic 1")
-    print("2.Heuristic 2")
-    print("3.Heuristic 3")
-    eval_choice_ai1 = int(input())
-
-    print("Choose evaluation function for AI player2:")
-    print("1.Heuristic 1")
-    print("2.Heuristic 2")
-    print("3.Heuristic 3")
-    eval_choice_ai2 = int(input())
+    while True:
+        print("Choose evaluation function for AI player1:")
+        print("1.Heuristic 1")
+        print("2.Heuristic 2")
+        print("3.Heuristic 3")
+        eval_choice_ai1 = int(input())
+        if eval_choice_ai1 in [1, 2, 3]:
+            break
+        print("Invalid option for AI player1. Please enter a valid number.")
+    while True:
+        print("Choose evaluation function for AI player2:")
+        print("1.Heuristic 1")
+        print("2.Heuristic 2")
+        print("3.Heuristic 3")
+        eval_choice_ai2 = int(input())
+        if eval_choice_ai2 in [1, 2, 3]:
+            break
+        print("Invalid option for AI player2. Please enter a valid number.")
 
     evaluation = [evaluate_heuristic1, evaluate_heuristic2, evaluate_heuristic3]
     print("Initial board state:")
@@ -344,29 +375,39 @@ def option3(player_1):
             break
         if not any(is_playable(board, column) for column in range(COLUMNS)):
             print_board(board)
-            print("It's a tie!")
+            print("It's a draw!")
             break
 
         # Switch AI players
         current_player = (current_player + 1) % 2
 
-
+# This is the main function that is used to start the game. If option 3 is selected then
+# the game asks to choose the evaluation function for both the AI players.
 def main():
-    print('Welcome to Connect Four!')
-    print('1. Human vs Human')
-    print('2. Human vs AI')
-    print('3. AI vs AI')
-    choose = int(input('Enter your choice: '))
-
-    if choose == 1:
-        # Human vs Human
-        option1(USER_1, USER_2)
-    elif choose == 2:
-        # Human vs AI
-        option2(USER_1, USER_2)
-    else:
-        # AI vs AI
-        option3(USER_1)
+    while True:
+        print('Welcome to Connect Four!')
+        print('1. Human vs Human')
+        print('2. Human vs AI')
+        print('3. AI vs AI')
+        choose = input('Enter your choice: ')
+        if choose.isdigit():
+            choose = int(choose)
+            if choose == 1:
+                # Human vs Human
+                option1(USER_1, USER_2)
+                break
+            elif choose == 2:
+                # Human vs AI
+                option2(USER_1, USER_2)
+                break
+            elif choose == 3:
+                # AI vs AI
+                option3(USER_1)
+                break
+            else:
+                print("Invalid option. Please enter a valid number.")
+        else:
+            print("Invalid option. Please enter a number.")
 
 
 if __name__ == '__main__':
