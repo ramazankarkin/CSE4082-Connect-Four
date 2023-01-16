@@ -2,7 +2,6 @@ from copy import deepcopy
 import random
 
 # Ramazan Karkin 150119512
-# Emirkan Karabulut 150118052
 # This is the homework 2 for the Artificial Intelligence course. This homework is about the Connect-Four game.
 
 
